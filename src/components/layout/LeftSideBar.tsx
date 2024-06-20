@@ -12,7 +12,14 @@ const LeftSideBar = () => {
 
   return (
     <div className="h-screen left-0 top-0 sticky p-10 flex flex-col gap-16 bg-blue-2 shadow-xl max-lg:hidden">
-      <Image src="/logo.png" alt="logo" width={150} height={70} />
+       <Image
+        src="/logo.png"
+        alt="logo"
+        width={150} // or any desired width
+        height={70} // or any desired height
+        priority // This will prioritize the loading of the image
+        className="logo"
+      />
 
       <div className="flex flex-col gap-12">
         {navLinks.map((link) => (
