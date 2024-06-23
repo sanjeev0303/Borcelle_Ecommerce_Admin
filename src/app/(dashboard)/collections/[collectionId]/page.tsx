@@ -3,6 +3,8 @@
 import CollectionForm from "@/components/collections/CollectionForm";
 import Loader from "@/components/custum ui/Loader";
 import { useEffect, useState } from "react";
+import axios from "axios";
+import { CollectionType } from "@/lib/types";
 
 const CollectionDetails = ({
   params,
@@ -16,20 +18,17 @@ const CollectionDetails = ({
 
   const getCollectionDetails = async () => {
     try {
-      const res = await fetch(`/api/collections/${params.collectionId}`, {
-        method: "GET",
-      });
+      const res = await axios.get<CollectionType>(`/api/collections/${params.collectionId}`);
 
-      if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+      if (!res) {
+        throw new Error(`HTTP error! there is no any response`);
       }
 
-      const data = await res.json();
-
+      
       // console.log("Fetched data:", data);
       // console.log("Response object:", res);
 
-      setCollectionDetails(data);
+      setCollectionDetails(res.data);
       setLoading(false);
     } catch (error) {
       // console.error("[GET_CollectionDetails]", error);

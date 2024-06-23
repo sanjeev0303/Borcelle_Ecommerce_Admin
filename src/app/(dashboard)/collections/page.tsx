@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { use, useEffect, useState } from 'react'
+import axios from 'axios'
 
 const page = () => {
 
@@ -18,12 +19,9 @@ const page = () => {
 
   const getCollections = async()=>{
     try {
-      const res = await fetch("/api/collections", {
-        method: "GET",
-      }) 
-
-      const data = await res.json()
-      setColletions(data)
+      const res = await axios.get("/api/collections") 
+     
+      setColletions(res.data)
       setLoading(false)
 
       // console.log(data);

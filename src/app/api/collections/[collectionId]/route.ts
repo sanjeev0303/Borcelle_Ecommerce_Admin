@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/DatabaseConnection";
 import Collection from "@/lib/models/CollectionSchema";
+import Product from "@/lib/models/ProductSchema";
 import { auth } from "@clerk/nextjs/server";
 import { useParams } from "next/navigation";
 import { NextRequest, NextResponse } from "next/server";
@@ -86,6 +87,11 @@ export const DELETE = async (
     }
 
     await Collection.findByIdAndDelete(params.collectionId);
+
+    await Product.updateMany(
+      { collections: params.collectionId },
+      { $pull: { collections: params.collectionId } }
+    )
 
     return new NextResponse("Collection is Deleted", { status: 200 });
   } catch (error) {
