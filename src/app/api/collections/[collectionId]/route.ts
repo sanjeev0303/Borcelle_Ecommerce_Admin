@@ -23,6 +23,9 @@ export const GET = async (
       );
     }
 
+    const response = NextResponse.json(collection, { status: 200 });
+        response.headers.set('Access-Control-Allow-Origin', '*');
+
     return new NextResponse(JSON.stringify(collection), { status: 200 });
   } catch (error) {
     console.error("[collectionId_GET]", error);
@@ -73,29 +76,29 @@ export const POST = async (
     }
   };
 
-export const DELETE = async (
-  req: NextRequest,
-  { params }: { params: { collectionId: string } }
-) => {
-  try {
-    await dbConnect();
-
-    const { userId } = auth();
-
-    if (!userId) {
-      return new NextResponse("Unauthorized", { status: 403 });
+  export const DELETE = async (
+    req: NextRequest,
+    { params }: { params: { collectionId: string } }
+  ) => {
+    try {
+      const { userId } = auth();
+  
+      if (!userId) {
+        return new NextResponse("Unauthorized", { status: 401 });
+      }
+  
+      await dbConnect();
+  
+      await Collection.findByIdAndDelete(params.collectionId);
+  
+      await Product.updateMany(
+        { collections: params.collectionId },
+        { $pull: { collections: params.collectionId } }
+      );
+      
+      return new NextResponse("Collection is deleted", { status: 200 });
+    } catch (err) {
+      console.log("[collectionId_DELETE]", err);
+      return new NextResponse("Internal error", { status: 500 });
     }
-
-    await Collection.findByIdAndDelete(params.collectionId);
-
-    await Product.updateMany(
-      { collections: params.collectionId },
-      { $pull: { collections: params.collectionId } }
-    )
-
-    return new NextResponse("Collection is Deleted", { status: 200 });
-  } catch (error) {
-    console.error("[collectionId_DELETE]", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
-  }
-};
+  };

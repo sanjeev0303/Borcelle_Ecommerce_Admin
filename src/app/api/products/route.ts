@@ -6,6 +6,10 @@ import { renderToHTML } from "next/dist/server/render";
 import { NextRequest, NextResponse } from "next/server";
 
 export const POST = async (req: NextRequest, res: NextResponse) => {
+  res.headers.set('Access-Control-Allow-Origin', '*');
+  res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
   try {
     await dbConnect();
 
@@ -49,15 +53,7 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 
     await newProduct.save();
 
-    if (collections) {
-      for(const collectionId of collections){
-        const collection = await Collection.findById(collectionId);
-        if (collection) {
-          collection.products.push(newProduct._id)
-          await collection.save()
-        }
-      }
-    }
+    
 
     return new NextResponse(JSON.stringify(newProduct), { status: 200 });
   } catch (error) {
@@ -66,22 +62,37 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
   }
 };
 
+// if (collections) {
+    //   for(const collectionId of collections){
+    //     const collection = await Collection.findById(collectionId);
+    //     if (collection) {
+    //       collection.products.push(newProduct._id)
+    //       await collection.save()
+    //     }
+    //   }
+    // }
 
-export const GET = async (req: NextRequest) => {
-  try {
-    await dbConnect();
+   
+    export const GET = async (req: NextRequest) => {
+      // const res = new NextResponse();
+      // res.headers.set('Access-Control-Allow-Origin', '*');
+      // res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      // res.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    
+      try {
+        await dbConnect();
+    
+        const products = await Product.find()
+          .sort({ createdAt: "desc" })
+          .populate({ path: "collections", model: Collection });
 
-    const products = await Product.find()
-      .sort({ createdAt: "desc" })
-      .populate({ path: "collections", model: Collection });
-
-    return NextResponse.json(products, { status: 200 });
-  } catch (err) {
-    console.log("[products_GET]", err);
-    return new NextResponse("Internal Error", { status: 500 });
-  }
-};
-
-
-
+          const response = NextResponse.json(products, { status: 200 });
+        response.headers.set('Access-Control-Allow-Origin', '*');
+    
+          return response
+      } catch (err) {
+        console.log("[products_GET]", err);
+        return new NextResponse("Internal Error", { status: 500 });
+      }
+    };
 // export const dynamic = "force-dynamic";

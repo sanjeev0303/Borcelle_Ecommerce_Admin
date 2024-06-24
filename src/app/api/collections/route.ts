@@ -43,16 +43,20 @@ export const POST = async (req: NextRequest, res: NextResponse) => {
 
 
 
-export const GET = async(req: NextRequest) =>{
-try {
-    await dbConnect()
+export const GET = async (req: NextRequest) => {
+    try {
+        await dbConnect();
 
-    const collections = await Collection.find().sort({ createdAt: "desc" })
+        const collections = await Collection.find().sort({ createdAt: "desc" });
 
-    return Response.json(collections, {status: 200})
-    
-} catch (error) {
-    console.error("[collections_GET]", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
-}
-}
+        const response = NextResponse.json(collections, { status: 200 });
+        response.headers.set('Access-Control-Allow-Origin', '*');
+        // response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        // response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+        return response;
+    } catch (error) {
+        console.error("[collections_GET]", error);
+        return new NextResponse("Internal Server Error", { status: 500 });
+    }
+};
