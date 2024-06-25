@@ -23,7 +23,10 @@ export const GET = async (
       );
     }
 
-    return new NextResponse(JSON.stringify(product), { status: 200 });
+    const response = NextResponse.json(product, { status: 200 });
+        response.headers.set('Access-Control-Allow-Origin', '*');
+
+    return response;
   } catch (error) {
     console.error("[productId_GET]", error);
     return new NextResponse("Internal Server Error", { status: 500 });
@@ -111,8 +114,11 @@ export const POST = async (
       ).populate({ path: "collections", model: Collection });
   
       await updatedProduct.save();
+
+      const response = NextResponse.json(updatedProduct, { status: 200 });
+        response.headers.set('Access-Control-Allow-Origin', '*');
   
-      return NextResponse.json(updatedProduct, { status: 200 });
+      return response
     } catch (error) {
       console.error("[productId_POST]", error);
       return new NextResponse("Internal Server Error", { status: 500 });
